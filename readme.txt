@@ -4,7 +4,6 @@ Tags: bbpress,bbpress load more, bbpress loadmore
 Requires at least: 3.5
 Tested up to: 3.6
 Stable tag: 1.0
-Version: 1.0
 License:GPLv2 or later
 
 load more topics with ajax
