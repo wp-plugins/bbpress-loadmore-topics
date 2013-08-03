@@ -2,8 +2,7 @@
 Contributors: ckchaudhary 
 Tags: bbpress,bbpress load more, bbpress loadmore
 Requires at least: 3.5
-Tested up to: 3.6
-Version: 1.0
+Tested up to: 3.6 
 Stable tag: 1.0
 License:GPLv2 or later
 
