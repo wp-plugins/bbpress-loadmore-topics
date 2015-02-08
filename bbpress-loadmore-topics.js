@@ -1,7 +1,4 @@
 jQuery(document).ready(function($){
-    var BBLMT_ = {
-        debug: true
-    };
 
     $(".js_bbtopics_loadmore").click(function(){
         //dont proceed if already loading..
@@ -16,35 +13,32 @@ jQuery(document).ready(function($){
         var data = {
             action      : 'bbpress_loadmore_topics',
             next_page   : $(btn).attr('data-nextpage'),
-            forum_id    : $(btn).attr('data-forumid')
+            forum_id    : $(btn).attr('data-forumid'),
+            nonce       : BBLMT_.nonce
         };
 
         $(this).addClass('loading');
         BBLMT_.doingajax = true;
-        if( BBLMT_.debug )
-            console.log("started ajax request");
-
+        
         $.ajax({
             type: "POST",
-            url: ajaxurl,
+            url: BBLMT_.ajaxurl,
             data: data,
             success: function (response) {
                 $(btn).removeClass('loading');
-                //bfln_after_get_new_notification(response);
                 BBLMT_.doingajax = false; //reset it so that next ajax request can process
-                if( BBLMT_.debug )
-                    console.log( "ajax request completed, aborting" );
 
                 if( typeof( response )!=='undefined' && response!=null && response!='0' && response!='' ){
                     $('ul.bbp-topics > .bbp-body' ).append( response );
-                    var nextpaged = ( $(btn).attr( 'data-nextpage' ) ) * 1 + 1;//damn!
+                    jQuery(".bbp-body ul.fade_effect").hide();
+                    jQuery(".bbp-body ul.fade_effect").show('slow');
+                    jQuery(".bbp-body ul.fade_effect").removeClass('fade_effect');
+                    var nextpaged = ( $(btn).attr( 'data-nextpage' ) ) * 1 + 1;//lol :)
                     $(btn).attr( 'data-nextpage', nextpaged );
                 }
                 else{
-                    if( BBLMT_.debug )
-                        console.log( "empty response" );
                     BBLMT_.nomoretopics = true;
-                    $(btn).text('No more posts..');
+                    $(btn).text(BBLMT_.text_nomoretopics);
                 }
             }
         });

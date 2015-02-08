@@ -1,25 +1,18 @@
 <?php 
 /* 
 Plugin Name: bbPress load more topics
+Plugin URI: http://webdeveloperswall.com/wordpress/bbpress-loading-more-topics-with-ajax
 Description: load more topics with ajax
-Version: 1.0
-Revision Date: 30 07, 2013
+Version: 1.1
+Revision Date: 02 08, 2015
 Requires at least: 3.0
-Tested up to: 3.5.2
+Tested up to: 4.1
 Author: ckchaudhary
-Author URI: http://webdeveloperswall.com/
+Author URI: http://webdeveloperswall.com/wordpress/bbpress-loading-more-topics-with-ajax
 */
 
-/*
- * Everything starts from here,
- * Once you have the plugin activated, call this function( make sure to use function_exists ) in bbpress template file called loop-topics.php,
- * append it inside <li class="bbp-body"> or <li class="bbp-footer">.
- * And you are done!
-*/
-function bbpresslmt_loadmore_button(){
-    $instance = BBPressMoreTopics::get_instance();
-    echo $instance->load_more_button();
-}
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 add_action( 'init', 'bbpresslmt_init_plugin' );
 function bbpresslmt_init_plugin(){
@@ -52,6 +45,7 @@ class BBPressMoreTopics{
             $args['post_parent'] = $forum_id;
         }
 
+
         if( $have_topics = emusic_set_bbp_query( 'hasmoretopics', $args ) ){
             if( $have_topics->max_num_pages > bbp_get_paged() ){
                 $html = "<ul class='activity-list topics-list-load-more'><li class='load-more'>";
@@ -60,8 +54,9 @@ class BBPressMoreTopics{
                 if( $forum_id ){
                     $html .= "data-forumid='$forum_id' ";
                 }
-
-                $html .= ">Load More</a></li></ul>";    
+                /*Use filter to change Button text.*/
+                $button_text = apply_filters( "bblmt_button_text", "Load More" );
+                $html .= "> $button_text </a></li></ul>";    
             }
         }
 
@@ -82,9 +77,21 @@ class BBPressMoreTopics{
             path_join( WP_PLUGIN_URL, basename( dirname( __FILE__ ) )."/bbpress-loadmore-topics.js" ),
             array( 'jquery' )
         );
+        wp_localize_script(
+            'bbpresslmt',
+			'BBLMT_',
+            array(
+                'ajaxurl' 			=> admin_url( 'admin-ajax.php' ),
+                'nonce'				=> wp_create_nonce('bbplmt'),
+				'nomoretopics'		=> false,
+				'text_nomoretopics' => apply_filters( 'bbpress_lmt_text_nomoretopics', 'No more posts..' ),
+            )
+        );
+
     }
 
     function ajax_load_more(){
+        check_ajax_referer('bbplmt','nonce');
         $next       = ( $_POST['next_page'] ? $_POST['next_page']   : 2 );
         $forum_id   = ( $_POST['forum_id']  ? $_POST['forum_id']    : 0 );
         die( $this->load_more( $next, $forum_id ) );
@@ -135,10 +142,24 @@ class BBPressMoreTopics{
         }
         if( !$added )
             $classes[] = 'topic';
+            $classes[] = 'fade_effect';
 
         return $classes;
     }
 }
+
+/*
+ * Everything starts from here,
+ * Once you have the plugin activated, call this function( make sure to use function_exists ) in bbpress template file called loop-topics.php,
+ * append it inside <li class="bbp-body"> or <li class="bbp-footer">.
+ * And you are done!
+*/
+function bbpresslmt_loadmore_button(){
+    $instance = BBPressMoreTopics::get_instance();
+    echo $instance->load_more_button();
+}
+
+add_action( "bbp_template_after_topics_loop", "bbpresslmt_loadmore_button" );
 
 /* #############################################################################
 support functions 
