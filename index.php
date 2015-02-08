@@ -5,7 +5,7 @@ Plugin URI: http://webdeveloperswall.com/wordpress/bbpress-loading-more-topics-w
 Description: load more topics with ajax
 Version: 1.1
 Revision Date: 02 08, 2015
-Requires at least: 3.0
+Requires at least: 3.5
 Tested up to: 4.1
 Author: ckchaudhary
 Author URI: http://webdeveloperswall.com/wordpress/bbpress-loading-more-topics-with-ajax
